@@ -1,0 +1,196 @@
+package search
+
+import (
+	"testing"
+)
+
+func TestParseBytes1(t *testing.T) {
+	input := []byte("aaabxxxxae____ac")
+
+	table := NewTable()
+	table.Add([]byte("a"), 0)
+	table.Add([]byte("aa"), 1)
+	table.Add([]byte("ab"), 2)
+	table.Add([]byte("ad"), 3)
+
+	expect := []struct {
+		pos, id int // pos is the accept position, that is start+len(token)
+		token   string
+	}{
+		{2, 1, "aa"},
+		{4, 2, "ab"},
+		{9, 0, "a"},
+		{15, 0, "a"},
+	}
+
+	idx := 0
+	table.ParseBytes(input, func(pos int, accepted *Entry) {
+		if idx > len(expect) {
+			t.Errorf("Too many results")
+			return
+		}
+		if pos != expect[idx].pos {
+			t.Errorf("Pos(%s)= %d, expected %d", expect[idx].token, pos, expect[idx].pos)
+		}
+		if accepted.ID() != expect[idx].id {
+			t.Errorf("Id(%s) = %d, expected %d", expect[idx].token, accepted.ID(), expect[idx].id)
+		}
+		if string(accepted.Bytes()) != expect[idx].token {
+			t.Errorf("Token(%s), got %s", expect[idx].token, accepted.Bytes())
+		}
+		idx++
+	})
+
+	if idx != len(expect) {
+		t.Errorf("Expected %d results, got %d", len(expect), idx)
+	}
+}
+
+func TestParseBytes2(t *testing.T) {
+	input := []byte("abba")
+
+	table := NewTable()
+	table.Add([]byte("a"), 0)
+	table.Add([]byte("abb"), 1)
+
+	expect := []struct {
+		pos, id int // pos is the accept position, that is start+len(token)
+		token   string
+	}{
+		{3, 1, "abb"},
+		{4, 0, "a"},
+	}
+
+	idx := 0
+	table.ParseBytes(input, func(pos int, accepted *Entry) {
+		if idx > len(expect) {
+			t.Errorf("Too many results")
+			return
+		}
+		if pos != expect[idx].pos {
+			t.Errorf("Pos(%s)= %d, expected %d", expect[idx].token, pos, expect[idx].pos)
+		}
+		if accepted.ID() != expect[idx].id {
+			t.Errorf("Id(%s) = %d, expected %d", expect[idx].token, accepted.ID(), expect[idx].id)
+		}
+		if string(accepted.Bytes()) != expect[idx].token {
+			t.Errorf("Token(%s), got %s", expect[idx].token, accepted.Bytes())
+		}
+		idx++
+	})
+
+	if idx != len(expect) {
+		t.Errorf("Expected %d results, got %d", len(expect), idx)
+	}
+}
+
+func TestParseBytes3(t *testing.T) {
+	input := []byte("abba")
+
+	table := NewTable()
+	table.Add([]byte("abc"), 0)
+
+	expect := []struct {
+		pos, id int // pos is the accept position, that is start+len(token)
+		token   string
+	}{}
+
+	idx := 0
+	table.ParseBytes(input, func(pos int, accepted *Entry) {
+		if idx > len(expect) {
+			t.Errorf("Too many results")
+			return
+		}
+		if pos != expect[idx].pos {
+			t.Errorf("Pos(%s)= %d, expected %d", expect[idx].token, pos, expect[idx].pos)
+		}
+		if accepted.ID() != expect[idx].id {
+			t.Errorf("Id(%s) = %d, expected %d", expect[idx].token, accepted.ID(), expect[idx].id)
+		}
+		if string(accepted.Bytes()) != expect[idx].token {
+			t.Errorf("Token(%s), got %s", expect[idx].token, accepted.Bytes())
+		}
+		idx++
+	})
+
+	if idx != len(expect) {
+		t.Errorf("Expected %d results, got %d", len(expect), idx)
+	}
+}
+
+func TestParseBytes4(t *testing.T) {
+	input := []byte("cabba")
+
+	table := NewTable()
+	table.Add([]byte("ba"), 0)
+	table.Add([]byte("abba"), 1)
+
+	expect := []struct {
+		pos, id int // pos is the accept position, that is start+len(token)
+		token   string
+	}{
+		{5, 1, "abba"},
+	}
+
+	idx := 0
+	table.ParseBytes(input, func(pos int, accepted *Entry) {
+		if idx > len(expect) {
+			t.Errorf("Too many results")
+			return
+		}
+		if pos != expect[idx].pos {
+			t.Errorf("Pos(%s)= %d, expected %d", expect[idx].token, pos, expect[idx].pos)
+		}
+		if accepted.ID() != expect[idx].id {
+			t.Errorf("Id(%s) = %d, expected %d", expect[idx].token, accepted.ID(), expect[idx].id)
+		}
+		if string(accepted.Bytes()) != expect[idx].token {
+			t.Errorf("Token(%s), got %s", expect[idx].token, accepted.Bytes())
+		}
+		idx++
+	})
+
+	if idx != len(expect) {
+		t.Errorf("Expected %d results, got %d", len(expect), idx)
+	}
+}
+
+func TestParsePDF1(t *testing.T) {
+	input := []byte("obj\re>>\rendobj")
+
+	table := NewTable()
+	table.Add([]byte("obj"), 1)
+	table.Add([]byte("endobj"), 2)
+
+	expect := []struct {
+		pos, id int // pos is the accept position, that is start+len(token)
+		token   string
+	}{
+		{3, 1, "obj"},
+		{14, 2, "endobj"},
+	}
+
+	idx := 0
+	table.ParseBytes(input, func(pos int, accepted *Entry) {
+		if idx > len(expect) {
+			t.Errorf("Too many results")
+			return
+		}
+		if pos != expect[idx].pos {
+			t.Errorf("Pos(%s)= %d, expected %d", expect[idx].token, pos, expect[idx].pos)
+		}
+		if accepted.ID() != expect[idx].id {
+			t.Errorf("Id(%s) = %d, expected %d", expect[idx].token, accepted.ID(), expect[idx].id)
+		}
+		if string(accepted.Bytes()) != expect[idx].token {
+			t.Errorf("Token(%s), got %s", expect[idx].token, accepted.Bytes())
+		}
+		idx++
+	})
+
+	if idx != len(expect) {
+		t.Errorf("Expected %d results, got %d", len(expect), idx)
+	}
+}
+
+//  obj\0x0de>>\0x0dendobj
