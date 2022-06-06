@@ -15,13 +15,15 @@ type Searcher struct {
 	caseInsensitive bool
 }
 
-func (s *Searcher) ReadFrom(r io.Reader) (n int, err error) {
+func (s *Searcher) ReadFrom(r io.Reader) (n int64, err error) {
 	var buffer [1024]byte
-	n, err = r.Read(buffer)
+	n_, err := r.Read(buffer)
 	for err != nil {
-		for _, b := range buffer[:n] {
+		for _, b := range buffer[:n_] {
 			s.Push(b) // if used -> ?
 		}
+		n += int64(n_)
+		n_, err = r.Read(buffer)
 	}
 	return
 }
