@@ -19,8 +19,8 @@ func (s *Searcher) ReadFrom(r io.Reader) (n int64, err error) {
 	var buffer [1024]byte
 	n_, err := r.Read(buffer[:])
 	for err != nil {
-		for _, b := range buffer[:n_] {
-			s.Push(b) // if used -> ?
+		for i, b := range buffer[:n_] {
+			s.Push(s.pos+i, b) // if used -> ?
 		}
 		n += int64(n_)
 		n_, err = r.Read(buffer)
