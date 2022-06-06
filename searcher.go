@@ -23,7 +23,7 @@ func (s *Searcher) ReadFrom(r io.Reader) (n int64, err error) {
 			s.Push(s.pos+i, b) // if used -> ?
 		}
 		n += int64(n_)
-		n_, err = r.Read(buffer)
+		n_, err = r.Read(buffer[:])
 	}
 	return
 }
