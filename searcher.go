@@ -1,5 +1,7 @@
 package search
 
+import "io"
+
 type SearcherCallback func(start, end, id int, b []byte)
 
 // Searcher contain data for repeated calls to the Match method.
@@ -11,6 +13,17 @@ type Searcher struct {
 	prevAccepted    bool
 	callback        SearcherCallback
 	caseInsensitive bool
+}
+
+func (s *Searcher) ReadFrom(r io.Reader) (n int, err error) {
+	var buffer [1024]byte
+	n, err = r.Read(buffer)
+	for err != nil {
+		for _, b := range buffer[:n] {
+			s.Push(b) // if used -> ?
+		}
+	}
+	return
 }
 
 func (s *Searcher) Callback(callback SearcherCallback) {
